@@ -2,166 +2,78 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Simulador PRO</title>
+<title>Simulador PRO Temperatura</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1e3a8a, #2563eb);
-    color: #333;
-}
-
-/* HEADER */
-header {
-    text-align: center;
-    color: white;
-    padding: 20px;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-/* CONTENEDOR */
-.container {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
-}
-
-/* TARJETAS */
-.card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-/* BOTONES */
-button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-button:hover {
-    background: #1e40af;
-}
-
-/* INPUTS */
-input[type=number] {
-    padding: 5px;
-    margin: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-/* SLIDERS */
-input[type=range] {
-    width: 100%;
-}
-
-.value {
-    font-weight: bold;
-    color: #2563eb;
-}
-
-/* GRID */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-    gap: 15px;
-}
-
-/* OCULTO */
+body { font-family: Arial; margin: 0; background: #f0f2f5; }
+header { background: #1e3a8a; color: white; padding: 15px; text-align: center; }
+.container { padding: 20px; }
+.card { background: white; margin-bottom: 15px; border-radius: 10px; padding: 15px; }
+button { background: #1e3a8a; color: white; padding: 8px; border: none; cursor: pointer; }
 .hidden { display: none; }
-
-/* ERROR */
-.error {
-    color: red;
-    font-weight: bold;
-}
-
-/* CANVAS */
-canvas {
-    margin-top: 15px;
-}
+canvas { max-width: 100%; }
+.slider-value { font-weight: bold; color: #1e3a8a; }
 </style>
 </head>
 
 <body>
 
 <header>
-Simulador Profesional de Temperatura 🔥
+<h1>Simulador PRO de Temperatura</h1>
 </header>
 
 <div class="container">
 
-<!-- PARÁMETROS -->
 <div class="card">
-<h2>Parámetros del Sistema</h2>
+<h2>Parámetros</h2>
 
 k: <input type="range" id="k" min="0.01" max="1" step="0.01" value="0.15">
-<span class="value" id="vk">0.15</span>
-
-<br>
+<span id="vk">0.15</span><br>
 
 T ambiente: <input type="range" id="Tamb" min="0" max="50" value="22">
-<span class="value" id="vTamb">22</span>
-
-<br>
+<span id="vTamb">22</span><br>
 
 h: <input type="range" id="h" min="0.01" max="1" step="0.01" value="0.1">
-<span class="value" id="vh">0.1</span>
-
-<br>
+<span id="vh">0.1</span><br>
 
 Tiempo: <input type="range" id="tf" min="10" max="100" value="50">
-<span class="value" id="vtf">50</span>
+<span id="vtf">50</span><br>
 
 </div>
 
-<!-- BOTONES -->
 <div class="card">
-<h2>Casos de Simulación</h2>
-<button onclick="mostrar(1)">Caso 1 🔴</button>
-<button onclick="mostrar(2)">Caso 2 ❄️</button>
-<button onclick="mostrar(3)">Caso 3 📈</button>
+<h2>Casos</h2>
+<button onclick="mostrar(1)">Caso 1</button>
+<button onclick="mostrar(2)">Caso 2</button>
+<button onclick="mostrar(3)">Caso 3</button>
 </div>
 
-<!-- CASOS -->
 <div id="caso1" class="card hidden">
-<h3>Caso 1: Carga Crítica</h3>
-<div class="grid">
-<div>T0 <input type="number" id="T1" value="25"></div>
-<div>H <input type="number" id="H1" value="12"></div>
-</div>
+<h3>Caso 1</h3>
+T0: <input type="number" id="T1" value="25">
+H: <input type="number" id="H1" value="12">
 <button onclick="simular(1)">Simular</button>
 <button onclick="animar(1)">Animar</button>
-<p id="error1" class="error"></p>
+<p id="error1"></p>
 <canvas id="graf1"></canvas>
 </div>
 
 <div id="caso2" class="card hidden">
-<h3>Caso 2: Enfriamiento</h3>
-T0 <input type="number" id="T2" value="80">
+<h3>Caso 2</h3>
+T0: <input type="number" id="T2" value="80">
 <button onclick="simular(2)">Simular</button>
 <button onclick="animar(2)">Animar</button>
-<p id="error2" class="error"></p>
+<p id="error2"></p>
 <canvas id="graf2"></canvas>
 </div>
 
 <div id="caso3" class="card hidden">
-<h3>Caso 3: Carga Variable</h3>
-T0 <input type="number" id="T3" value="25">
+<h3>Caso 3</h3>
+T0: <input type="number" id="T3" value="25">
 <button onclick="simular(3)">Simular</button>
 <button onclick="animar(3)">Animar</button>
-<p id="error3" class="error"></p>
+<p id="error3"></p>
 <canvas id="graf3"></canvas>
 </div>
 
@@ -171,14 +83,14 @@ T0 <input type="number" id="T3" value="25">
 let charts = {};
 
 // sliders dinámicos
-document.querySelectorAll("input[type=range]").forEach(el=>{
-    el.addEventListener("input",()=>{
+document.querySelectorAll("input[type=range]").forEach(el => {
+    el.addEventListener("input", () => {
         document.getElementById("v"+el.id).innerText = el.value;
     });
 });
 
-function mostrar(c){
-    ["caso1","caso2","caso3"].forEach(id=>{
+function mostrar(c) {
+    ["caso1","caso2","caso3"].forEach(id => {
         document.getElementById(id).classList.add("hidden");
     });
     document.getElementById("caso"+c).classList.remove("hidden");
@@ -195,8 +107,7 @@ function calcular(tipo, anim=false){
     let h = parseFloat(document.getElementById("h").value);
     let tf = parseFloat(document.getElementById("tf").value);
 
-    let T_e = tipo==1?T1.value:tipo==2?T2.value:T3.value;
-    T_e = parseFloat(T_e);
+    let T_e = tipo==1?parseFloat(T1.value):tipo==2?parseFloat(T2.value):parseFloat(T3.value);
     let T_r = T_e;
 
     let t=0;
@@ -205,9 +116,10 @@ function calcular(tipo, anim=false){
     function paso(){
 
         if(t>tf){
-            let error = Math.abs(euler[euler.length-1]-rk4[rk4.length-1]);
+            // calcular error final
+            let error = Math.abs(euler[euler.length-1] - rk4[rk4.length-1]);
             document.getElementById("error"+tipo).innerText =
-                "Error: "+error.toFixed(4)+" °C";
+                "Error Euler vs RK4: " + error.toFixed(4) + " °C";
             return;
         }
 
@@ -219,8 +131,10 @@ function calcular(tipo, anim=false){
         euler.push(T_e);
         rk4.push(T_r);
 
+        // Euler
         T_e += h * f(T_e,k,Tamb,H);
 
+        // RK4
         let k1=f(T_r,k,Tamb,H);
         let k2=f(T_r+h*k1/2,k,Tamb,H);
         let k3=f(T_r+h*k2/2,k,Tamb,H);
@@ -228,18 +142,22 @@ function calcular(tipo, anim=false){
 
         T_r += (h/6)*(k1+2*k2+2*k3+k4);
 
-        t+=h;
+        t += h;
 
         dibujar(tipo, tiempo, euler, rk4);
 
-        if(anim) setTimeout(paso, 30);
-        else paso();
+        if(anim){
+            setTimeout(paso, 30);
+        } else {
+            paso(); // cálculo rápido
+        }
     }
 
     paso();
 }
 
 function dibujar(tipo, tiempo, euler, rk4){
+
     let id="graf"+tipo;
     let ctx=document.getElementById(id).getContext("2d");
 
@@ -250,8 +168,8 @@ function dibujar(tipo, tiempo, euler, rk4){
         data:{
             labels:tiempo,
             datasets:[
-                {label:"Euler",data:euler},
-                {label:"RK4",data:rk4}
+                {label:"Euler",data:euler,borderWidth:2},
+                {label:"RK4",data:rk4,borderWidth:2}
             ]
         }
     });
