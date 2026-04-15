@@ -2,326 +2,131 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Temperatura - Euler, RK2 y RK4</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <title>Simulación de Temperatura</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: system-ui, sans-serif; }
-        .card { transition: all 0.3s; }
-
-        /* Gráficas más CUADRADAS */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 580px;           /* Ancho máximo controlado */
-            height: 580px;              /* Altura igual al ancho → más cuadrado */
-            margin: 0 auto;
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
         }
-
+        header {
+            background: #1e3a8a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        section {
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
         canvas {
-            background: #f8fafc;
-            border-radius: 20px;
+            max-width: 100%;
+        }
+        button {
+            background: #1e3a8a;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-<header class="bg-gradient-to-r from-orange-600 to-amber-600 text-white py-12 shadow-lg">
-    <div class="max-w-6xl mx-auto text-center px-4">
-        <h1 class="text-4xl font-bold">Simulador de Temperatura en Servidores</h1>
-        <p class="mt-3 text-xl opacity-90">Comparación: Euler • RK2 • RK4</p>
-    </div>
+<header>
+    <h1>Simulación de Temperatura de un Servidor</h1>
 </header>
 
-<div class="max-w-6xl mx-auto px-6 py-10">
+<section>
 
-    <!-- Fundamento Teórico -->
-    <div class="card bg-white rounded-3xl shadow-xl p-10 mb-10">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Fundamento Teórico</h2>
-        <div class="bg-gray-100 p-8 rounded-2xl text-center text-4xl font-mono">
-            dT/dt = k (T<sub>amb</sub> − T(t)) + H(t)
-        </div>
-    </div>
-
-    <!-- Parámetros -->
-    <div class="card bg-white rounded-3xl shadow-xl p-10 mb-12">
-        <h2 class="text-3xl font-bold mb-8">Parámetros del Sistema</h2>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-            <div>
-                <label class="block text-lg font-medium mb-3">k</label>
-                <input type="range" id="k" min="0.01" max="0.5" step="0.01" value="0.15" class="w-full accent-orange-600">
-                <div class="flex justify-between text-base mt-2"><span>0.01</span><span id="val-k" class="font-bold text-xl">0.15</span><span>0.5</span></div>
-            </div>
-            <div>
-                <label class="block text-lg font-medium mb-3">T ambiente (°C)</label>
-                <input type="range" id="Tamb" min="10" max="40" step="0.5" value="22" class="w-full accent-orange-600">
-                <div class="flex justify-between text-base mt-2"><span>10</span><span id="val-Tamb" class="font-bold text-xl">22</span><span>40</span></div>
-            </div>
-            <div>
-                <label class="block text-lg font-medium mb-3">Paso h</label>
-                <input type="range" id="h" min="0.01" max="0.5" step="0.01" value="0.1" class="w-full accent-orange-600">
-                <div class="flex justify-between text-base mt-2"><span>0.01</span><span id="val-h" class="font-bold text-xl">0.1</span><span>0.5</span></div>
-            </div>
-            <div>
-                <label class="block text-lg font-medium mb-3">Tiempo final (s)</label>
-                <input type="range" id="tf" min="50" max="300" step="10" value="180" class="w-full accent-orange-600">
-                <div class="flex justify-between text-base mt-2"><span>50</span><span id="val-tf" class="font-bold text-xl">180</span><span>300</span></div>
-            </div>
-        </div>
-        <button onclick="resetParametros()" class="mt-10 px-10 py-4 bg-gray-800 hover:bg-gray-900 text-white text-lg rounded-2xl font-medium">
-            Resetear parámetros
-        </button>
-    </div>
-
-    <!-- Casos -->
-    <h2 class="text-4xl font-bold mb-12 text-center">Casos de Simulación</h2>
-    
-    <div class="grid md:grid-cols-3 gap-12">
-
-        <!-- Caso 1 -->
-        <div class="card bg-white rounded-3xl shadow-xl p-8">
-            <h3 class="font-bold text-3xl text-red-600 mb-6">Caso 1: Carga Crítica (H=12)</h3>
-            <div class="grid grid-cols-2 gap-6 mb-10">
-                <div>
-                    <label class="block text-sm mb-2">T₀ (°C)</label>
-                    <input type="number" id="T01" value="25" class="w-full border-2 rounded-xl px-4 py-3 text-lg">
-                </div>
-                <div>
-                    <label class="block text-sm mb-2">H</label>
-                    <input type="number" id="H1" value="12" class="w-full border-2 rounded-xl px-4 py-3 text-lg">
-                </div>
-            </div>
-            <div class="flex gap-4">
-                <button onclick="simular(1)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
-                <button onclick="animar(1)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
-            </div>
-            <p id="error1" class="mt-8 text-red-600 font-medium text-center text-lg"></p>
-            <div class="chart-container mt-10">
-                <canvas id="graf1"></canvas>
-            </div>
-        </div>
-
-        <!-- Caso 2 -->
-        <div class="card bg-white rounded-3xl shadow-xl p-8">
-            <h3 class="font-bold text-3xl text-blue-600 mb-6">Caso 2: Óptimo (Idle, H=0)</h3>
-            <div class="mb-10">
-                <label class="block text-sm mb-2">T₀ (°C)</label>
-                <input type="number" id="T02" value="80" class="border-2 rounded-xl px-4 py-3 text-lg w-32">
-            </div>
-            <div class="flex gap-4">
-                <button onclick="simular(2)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
-                <button onclick="animar(2)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
-            </div>
-            <p id="error2" class="mt-8 text-red-600 font-medium text-center text-lg"></p>
-            <div class="chart-container mt-10">
-                <canvas id="graf2"></canvas>
-            </div>
-        </div>
-
-        <!-- Caso 3 -->
-        <div class="card bg-white rounded-3xl shadow-xl p-8">
-            <h3 class="font-bold text-3xl text-purple-600 mb-6">Caso 3: Carga Variable</h3>
-            <p class="text-gray-600 mb-8 text-lg">H(t) = 10·sin(t) + 10</p>
-            <div class="mb-10">
-                <label class="block text-sm mb-2">T₀ (°C)</label>
-                <input type="number" id="T03" value="25" class="border-2 rounded-xl px-4 py-3 text-lg w-32">
-            </div>
-            <div class="flex gap-4">
-                <button onclick="simular(3)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
-                <button onclick="animar(3)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
-            </div>
-            <p id="error3" class="mt-8 text-red-600 font-medium text-center text-lg"></p>
-            <div class="chart-container mt-10">
-                <canvas id="graf3"></canvas>
-            </div>
-        </div>
-    </div>
-
+<div class="card">
+    <h2>Gráfica: Euler vs RK4</h2>
+    <button onclick="simular()">Generar Gráfica</button>
+    <canvas id="grafica"></canvas>
 </div>
 
+</section>
+
 <script>
-// ==================== LÓGICA (igual que antes) ====================
-let charts = {};
-
-document.querySelectorAll('input[type="range"]').forEach(slider => {
-    const valEl = document.getElementById('val-' + slider.id);
-    if (valEl) slider.addEventListener('input', () => valEl.textContent = slider.value);
-});
-
-function getParams() {
-    return {
-        k: parseFloat(document.getElementById('k').value),
-        Tamb: parseFloat(document.getElementById('Tamb').value),
-        h: parseFloat(document.getElementById('h').value),
-        tf: parseFloat(document.getElementById('tf').value)
-    };
-}
-
-function f(T, k, Tamb, H) {
-    return k * (Tamb - T) + H;
-}
-
-function rk2Step(T, k, Tamb, H, h) {
-    const k1 = f(T, k, Tamb, H);
-    const k2 = f(T + h * k1, k, Tamb, H);
-    return T + (h / 2) * (k1 + k2);
-}
-
-function rk4Step(T, k, Tamb, H, h) {
-    const k1 = f(T, k, Tamb, H);
-    const k2 = f(T + h * k1 / 2, k, Tamb, H);
-    const k3 = f(T + h * k2 / 2, k, Tamb, H);
-    const k4 = f(T + h * k3, k, Tamb, H);
-    return T + (h / 6) * (k1 + 2*k2 + 2*k3 + k4);
-}
-
-function simular(caso) { calcular(caso, false); }
-function animar(caso) { calcular(caso, true); }
-
-function calcular(caso, esAnimacion) {
-    const p = getParams();
-    let T0 = caso === 1 ? parseFloat(document.getElementById('T01').value) || 25 :
-             caso === 2 ? parseFloat(document.getElementById('T02').value) || 80 :
-                          parseFloat(document.getElementById('T03').value) || 25;
-
-    let getH = caso === 1 ? () => parseFloat(document.getElementById('H1').value) || 12 :
-               caso === 2 ? () => 0 :
-                            (t) => 10 * Math.sin(t) + 10;
+function simular() {
+    let k = 0.15;
+    let Tamb = 22;
+    let H = 12;
+    let h = 0.1;
+    let t_final = 50;
 
     let t = 0;
-    let tiempos = [], eulerD = [], rk2D = [], rk4D = [];
-    let Te = T0, Tr2 = T0, Tr4 = T0;
 
-    const idGraf = 'graf' + caso;
-    const idError = 'error' + caso;
-    document.getElementById(idError).innerHTML = '';
+    let T_euler = 25;
+    let T_rk4 = 25;
 
-    function paso() {
-        if (t > p.tf + 0.01) {
-            const err = Math.abs(eulerD[eulerD.length-1] - rk4D[rk4D.length-1]);
-            document.getElementById(idError).innerHTML = `Error Euler vs RK4: <strong>${err.toFixed(4)} °C</strong>`;
-            return;
-        }
+    let tiempo = [];
+    let datosEuler = [];
+    let datosRK4 = [];
 
-        const H = getH(t);
-        tiempos.push(t.toFixed(1));
-        eulerD.push(parseFloat(Te.toFixed(3)));
-        rk2D.push(parseFloat(Tr2.toFixed(3)));
-        rk4D.push(parseFloat(Tr4.toFixed(3)));
+    while (t <= t_final) {
+        tiempo.push(t.toFixed(1));
+        datosEuler.push(T_euler);
+        datosRK4.push(T_rk4);
 
-        Te += p.h * f(Te, p.k, p.Tamb, H);
-        Tr2 = rk2Step(Tr2, p.k, p.Tamb, H, p.h);
-        Tr4 = rk4Step(Tr4, p.k, p.Tamb, H, p.h);
+        // Euler
+        T_euler = T_euler + h * (k * (Tamb - T_euler) + H);
 
-        t += p.h;
+        // RK4
+        let f = (T) => k * (Tamb - T) + H;
 
-        if (esAnimacion) {
-            actualizarGrafica(idGraf, tiempos, eulerD, rk2D, rk4D, caso);
-            setTimeout(paso, 25);
-        } else {
-            paso();
-        }
+        let k1 = f(T_rk4);
+        let k2 = f(T_rk4 + h * k1 / 2);
+        let k3 = f(T_rk4 + h * k2 / 2);
+        let k4 = f(T_rk4 + h * k3);
+
+        T_rk4 = T_rk4 + (h / 6) * (k1 + 2*k2 + 2*k3 + k4);
+
+        t += h;
     }
 
-    paso();
+    let ctx = document.getElementById('grafica').getContext('2d');
 
-    if (!esAnimacion) {
-        setTimeout(() => dibujarGrafica(idGraf, tiempos, eulerD, rk2D, rk4D, caso), 40);
-    }
-}
-
-function dibujarGrafica(id, labels, euler, rk2, rk4, caso) {
-    if (charts[id]) charts[id].destroy();
-
-    const ctx = document.getElementById(id).getContext('2d');
-
-    let datasets = [
-        { label: 'Euler', data: euler, borderColor: '#ef4444', borderWidth: 5, tension: 0.25 },
-        { label: 'RK2 (Heun)', data: rk2, borderColor: '#16a34a', borderWidth: 5, tension: 0.25 },
-        { label: 'RK4', data: rk4, borderColor: '#2563eb', borderWidth: 5, tension: 0.25 }
-    ];
-
-    if (caso === 1) {
-        datasets.push({
-            label: 'Equilibrio Teórico (102°C)',
-            data: Array(labels.length).fill(102),
-            borderColor: '#854d0e',
-            borderWidth: 3,
-            borderDash: [10, 5],
-            pointRadius: 0
-        });
-    }
-    if (caso === 2) {
-        datasets.push({
-            label: 'T ambiente (22°C)',
-            data: Array(labels.length).fill(22),
-            borderColor: '#dc2626',
-            borderWidth: 3,
-            borderDash: [10, 5],
-            pointRadius: 0
-        });
+    if (window.miGrafica) {
+        window.miGrafica.destroy();
     }
 
-    charts[id] = new Chart(ctx, {
+    window.miGrafica = new Chart(ctx, {
         type: 'line',
-        data: { labels: labels, datasets: datasets },
+        data: {
+            labels: tiempo,
+            datasets: [
+                {
+                    label: 'Euler',
+                    data: datosEuler,
+                    borderWidth: 2
+                },
+                {
+                    label: 'RK4',
+                    data: datosRK4,
+                    borderWidth: 2
+                }
+            ]
+        },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 1400 },
             plugins: {
-                legend: { 
-                    position: 'top',
-                    labels: { font: { size: 15 }, padding: 20, boxWidth: 25 }
-                },
-                title: { 
-                    display: true, 
-                    text: `Caso ${id.slice(-1)} - Euler, RK2 y RK4`,
-                    font: { size: 19 },
-                    padding: 25
-                }
-            },
-            scales: {
-                y: { 
-                    title: { display: true, text: 'Temperatura (°C)', font: { size: 16 } },
-                    grid: { color: '#e2e8f0' }
-                },
-                x: { 
-                    title: { display: true, text: 'Tiempo (segundos)', font: { size: 16 } },
-                    grid: { color: '#e2e8f0' }
+                legend: {
+                    display: true
                 }
             }
         }
     });
 }
-
-function actualizarGrafica(id, labels, euler, rk2, rk4) {
-    if (!charts[id]) return;
-    charts[id].data.labels = labels;
-    charts[id].data.datasets[0].data = euler;
-    charts[id].data.datasets[1].data = rk2;
-    charts[id].data.datasets[2].data = rk4;
-    charts[id].update('none');
-}
-
-function resetParametros() {
-    document.getElementById('k').value = 0.15;
-    document.getElementById('Tamb').value = 22;
-    document.getElementById('h').value = 0.1;
-    document.getElementById('tf').value = 180;
-    document.getElementById('val-k').textContent = '0.15';
-    document.getElementById('val-Tamb').textContent = '22';
-    document.getElementById('val-h').textContent = '0.1';
-    document.getElementById('val-tf').textContent = '180';
-}
-
-window.onload = () => {
-    document.getElementById('val-k').textContent = '0.15';
-    document.getElementById('val-Tamb').textContent = '22';
-    document.getElementById('val-h').textContent = '0.1';
-    document.getElementById('val-tf').textContent = '180';
-};
 </script>
+
 </body>
 </html>
