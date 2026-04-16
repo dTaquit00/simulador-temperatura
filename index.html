@@ -10,16 +10,22 @@
         body { font-family: system-ui, sans-serif; }
         .card { transition: all 0.3s; }
 
+        /* Gráficas con MÁS ESPACIO HORIZONTAL */
         .chart-wrapper {
             position: relative;
             width: 100%;
-            max-width: 620px;
-            height: 620px;
-            margin: 20px auto;
-            padding: 15px;
+            max-width: 920px;           /* Más ancho (antes 680px) */
+            height: 520px;              /* Altura equilibrada */
+            margin: 30px auto;
+            padding: 20px;
             background: white;
             border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
     </style>
 </head>
@@ -42,40 +48,36 @@
         </div>
     </div>
 
-    <!-- Parámetros del Sistema -->
+    <!-- Parámetros -->
     <div class="card bg-white rounded-3xl shadow-xl p-10 mb-14">
         <h2 class="text-3xl font-bold mb-8 text-center">Parámetros del Sistema</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
-
             <div>
-                <label class="block text-lg font-medium mb-3">k (0 a 1)</label>
-                <input type="range" id="k" min="0.01" max="1" step="0.01" value="0.15" class="w-full accent-orange-600">
+                <label class="block text-lg font-medium mb-3">k (0.1 a 1)</label>
+                <input type="range" id="k" min="0.1" max="1" step="0.01" value="0.15" class="w-full accent-orange-600">
                 <div class="flex justify-between text-base mt-2">
-                    <span>0.01</span><span id="val-k" class="font-bold text-xl">0.15</span><span>1.0</span>
+                    <span>0.1</span><span id="val-k" class="font-bold text-xl">0.15</span><span>1.0</span>
                 </div>
             </div>
-
             <div>
-                <label class="block text-lg font-medium mb-3">T ambiente (0 a 1)</label>
-                <input type="range" id="Tamb" min="0" max="1" step="0.01" value="0.22" class="w-full accent-orange-600">
+                <label class="block text-lg font-medium mb-3">T ambiente (0 a 100)</label>
+                <input type="range" id="Tamb" min="0" max="100" step="0.5" value="22" class="w-full accent-orange-600">
                 <div class="flex justify-between text-base mt-2">
-                    <span>0</span><span id="val-Tamb" class="font-bold text-xl">0.22</span><span>1.0</span>
+                    <span>0</span><span id="val-Tamb" class="font-bold text-xl">22</span><span>100</span>
                 </div>
             </div>
-
             <div>
-                <label class="block text-lg font-medium mb-3">Paso h (0 a 1)</label>
-                <input type="range" id="h" min="0.01" max="1" step="0.01" value="0.1" class="w-full accent-orange-600">
+                <label class="block text-lg font-medium mb-3">Paso h (0.1 a 1)</label>
+                <input type="range" id="h" min="0.1" max="1" step="0.01" value="0.1" class="w-full accent-orange-600">
                 <div class="flex justify-between text-base mt-2">
-                    <span>0.01</span><span id="val-h" class="font-bold text-xl">0.10</span><span>1.0</span>
+                    <span>0.1</span><span id="val-h" class="font-bold text-xl">0.10</span><span>1.0</span>
                 </div>
             </div>
-
             <div>
                 <label class="block text-lg font-medium mb-3">Tiempo final (s)</label>
-                <input type="range" id="tf" min="10" max="180" step="5" value="150" class="w-full accent-orange-600">
+                <input type="range" id="tf" min="1" max="3600" step="10" value="150" class="w-full accent-orange-600">
                 <div class="flex justify-between text-base mt-2">
-                    <span>10</span><span id="val-tf" class="font-bold text-xl">150</span><span>180</span>
+                    <span>1</span><span id="val-tf" class="font-bold text-xl">150</span><span>3600</span>
                 </div>
             </div>
         </div>
@@ -86,7 +88,7 @@
         </button>
     </div>
 
-    <!-- Casos de Simulación -->
+    <!-- Casos -->
     <h2 class="text-4xl font-bold mb-12 text-center">Casos de Simulación</h2>
     
     <div class="grid md:grid-cols-3 gap-12">
@@ -112,8 +114,8 @@
                 <button onclick="simular(1)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
                 <button onclick="animar(1)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
             </div>
-            <p id="error1" class="mt-8 text-center text-red-600 font-medium min-h-[28px]"></p>
-            <div class="chart-wrapper mt-10">
+            <p id="error1" class="mt-8 text-center text-red-600 font-medium min-h-[32px]"></p>
+            <div class="chart-wrapper mt-8">
                 <canvas id="graf1"></canvas>
             </div>
         </div>
@@ -131,8 +133,8 @@
                 <button onclick="simular(2)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
                 <button onclick="animar(2)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
             </div>
-            <p id="error2" class="mt-8 text-center text-red-600 font-medium min-h-[28px]"></p>
-            <div class="chart-wrapper mt-10">
+            <p id="error2" class="mt-8 text-center text-red-600 font-medium min-h-[32px]"></p>
+            <div class="chart-wrapper mt-8">
                 <canvas id="graf2"></canvas>
             </div>
         </div>
@@ -151,8 +153,8 @@
                 <button onclick="simular(3)" class="flex-1 py-5 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl text-xl font-semibold">Simular</button>
                 <button onclick="animar(3)" class="flex-1 py-5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xl font-semibold">Animar</button>
             </div>
-            <p id="error3" class="mt-8 text-center text-red-600 font-medium min-h-[28px]"></p>
-            <div class="chart-wrapper mt-10">
+            <p id="error3" class="mt-8 text-center text-red-600 font-medium min-h-[32px]"></p>
+            <div class="chart-wrapper mt-8">
                 <canvas id="graf3"></canvas>
             </div>
         </div>
@@ -224,17 +226,17 @@ function calcular(caso, esAnimacion) {
 
     function paso() {
         if (t > p.tf + 0.01) {
-            // Cálculo del error en PORCENTAJE
-            const valorRK4 = rk4D[rk4D.length-1];
-            const errorAbs = Math.abs(eulerD[eulerD.length-1] - valorRK4);
-            let errorPorcentaje = 0;
+            const rk4Final = rk4D[rk4D.length-1];
+            const errEuler = Math.abs(eulerD[eulerD.length-1] - rk4Final);
+            const errRK2 = Math.abs(rk2D[rk2D.length-1] - rk4Final);
 
-            if (valorRK4 !== 0) {
-                errorPorcentaje = (errorAbs / Math.abs(valorRK4)) * 100;
-            }
+            const porcEuler = rk4Final !== 0 ? (errEuler / Math.abs(rk4Final)) * 100 : 0;
+            const porcRK2 = rk4Final !== 0 ? (errRK2 / Math.abs(rk4Final)) * 100 : 0;
 
-            document.getElementById(idError).innerHTML = 
-                `Error final Euler vs RK4: <strong>${errorPorcentaje.toFixed(4)} %</strong>`;
+            document.getElementById(idError).innerHTML = `
+                Error RK4 vs Euler: <strong>${porcEuler.toFixed(4)} %</strong><br>
+                Error RK4 vs RK2: <strong>${porcRK2.toFixed(4)} %</strong>
+            `;
             return;
         }
 
@@ -251,7 +253,7 @@ function calcular(caso, esAnimacion) {
         t += p.h;
 
         if (esAnimacion) {
-            actualizarGrafica(idGraf, tiempos, eulerD, rk2D, rk4D, caso);
+            actualizarGrafica(idGraf, tiempos, eulerD, rk2D, rk4D);
             setTimeout(paso, 28);
         } else {
             paso();
@@ -271,32 +273,68 @@ function dibujarGrafica(id, labels, euler, rk2, rk4, caso) {
     const ctx = document.getElementById(id).getContext('2d');
 
     let datasets = [
-        { label: 'Euler', data: euler, borderColor: '#ef4444', borderWidth: 5, tension: 0.3 },
-        { label: 'RK2 (Heun)', data: rk2, borderColor: '#16a34a', borderWidth: 5, tension: 0.3 },
-        { label: 'RK4', data: rk4, borderColor: '#2563eb', borderWidth: 5, tension: 0.3 }
+        { 
+            label: 'Euler', 
+            data: euler.map((y,i) => ({x: parseFloat(labels[i]), y: y})), 
+            borderColor: '#ef4444', 
+            backgroundColor: '#ef4444',
+            pointRadius: 4.5,
+            showLine: false 
+        },
+        { 
+            label: 'RK2 (Heun)', 
+            data: rk2.map((y,i) => ({x: parseFloat(labels[i]), y: y})), 
+            borderColor: '#16a34a', 
+            backgroundColor: '#16a34a',
+            pointRadius: 4.5,
+            showLine: false 
+        },
+        { 
+            label: 'RK4', 
+            data: rk4.map((y,i) => ({x: parseFloat(labels[i]), y: y})), 
+            borderColor: '#2563eb', 
+            backgroundColor: '#2563eb',
+            pointRadius: 4.5,
+            showLine: false 
+        }
     ];
 
     if (caso === 1) {
-        datasets.push({ label: 'Equilibrio (102°C)', data: Array(labels.length).fill(102), borderColor: '#854d0e', borderWidth: 3, borderDash: [8, 4], pointRadius: 0 });
+        datasets.push({ 
+            label: 'Equilibrio (102°C)', 
+            data: labels.map(x => ({x: parseFloat(x), y: 102})), 
+            borderColor: '#854d0e', 
+            borderWidth: 2.5, 
+            borderDash: [8, 4],
+            pointRadius: 0,
+            showLine: true 
+        });
     }
     if (caso === 2) {
-        datasets.push({ label: 'T ambiente (22°C)', data: Array(labels.length).fill(22), borderColor: '#dc2626', borderWidth: 3, borderDash: [8, 4], pointRadius: 0 });
+        datasets.push({ 
+            label: 'T ambiente (22°C)', 
+            data: labels.map(x => ({x: parseFloat(x), y: 22})), 
+            borderColor: '#dc2626', 
+            borderWidth: 2.5, 
+            borderDash: [8, 4],
+            pointRadius: 0,
+            showLine: true 
+        });
     }
 
     charts[id] = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets },
+        type: 'scatter',
+        data: { datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 1200 },
             plugins: {
                 legend: { position: 'top', labels: { font: { size: 15 }, padding: 20 } },
-                title: { display: true, text: `Caso ${id.slice(-1)} - Euler, RK2 y RK4`, font: { size: 19 }, padding: 25 }
+                title: { display: true, text: `Caso ${id.slice(-1)}`, font: { size: 19 } }
             },
             scales: {
-                y: { title: { display: true, text: 'Temperatura (°C)', font: { size: 16 } } },
-                x: { title: { display: true, text: 'Tiempo (segundos)', font: { size: 16 } } }
+                x: { title: { display: true, text: 'Tiempo (segundos)' } },
+                y: { title: { display: true, text: 'Temperatura (°C)' } }
             }
         }
     });
@@ -304,28 +342,28 @@ function dibujarGrafica(id, labels, euler, rk2, rk4, caso) {
 
 function actualizarGrafica(id, labels, euler, rk2, rk4) {
     if (!charts[id]) return;
-    charts[id].data.labels = labels;
-    charts[id].data.datasets[0].data = euler;
-    charts[id].data.datasets[1].data = rk2;
-    charts[id].data.datasets[2].data = rk4;
+    const ds = charts[id].data.datasets;
+    ds[0].data = euler.map((y,i) => ({x: parseFloat(labels[i]), y}));
+    ds[1].data = rk2.map((y,i) => ({x: parseFloat(labels[i]), y}));
+    ds[2].data = rk4.map((y,i) => ({x: parseFloat(labels[i]), y}));
     charts[id].update('none');
 }
 
 function resetParametros() {
     document.getElementById('k').value = 0.15;
-    document.getElementById('Tamb').value = 0.22;
+    document.getElementById('Tamb').value = 22;
     document.getElementById('h').value = 0.1;
     document.getElementById('tf').value = 150;
 
     document.getElementById('val-k').textContent = '0.15';
-    document.getElementById('val-Tamb').textContent = '0.22';
+    document.getElementById('val-Tamb').textContent = '22';
     document.getElementById('val-h').textContent = '0.10';
     document.getElementById('val-tf').textContent = '150';
 }
 
 window.onload = () => {
     document.getElementById('val-k').textContent = '0.15';
-    document.getElementById('val-Tamb').textContent = '0.22';
+    document.getElementById('val-Tamb').textContent = '22';
     document.getElementById('val-h').textContent = '0.10';
     document.getElementById('val-tf').textContent = '150';
 };
